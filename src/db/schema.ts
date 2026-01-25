@@ -5,9 +5,8 @@ export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   description: text("description"),
-  icon: text("icon"), // SVG path or image URL
-  iconType: text("icon_type"), // 'svg', 'image', 'emoji'
-  images: text("images", { mode: "json" }).$type<string[]>(), // Array of image URLs/paths (screenshots)
+  icon: text("icon"), // Base64 image data URL
+  images: text("images", { mode: "json" }).$type<string[]>(), // Array of base64 image data URLs (screenshots)
   techStack: text("tech_stack", { mode: "json" }).$type<string[]>(),
   githubRepo: text("github_repo"),
   githubStats: text("github_stats", { mode: "json" }).$type<{

@@ -21,7 +21,7 @@ export interface Tech {
   desc: string;
   link: string;
   type: TechType;
-  icon: string; // Simple Devicon class name
+  icon: string; // Path to icon file
 }
 
 const techList: Tech[] = [
@@ -31,7 +31,7 @@ const techList: Tech[] = [
     desc: "A JavaScript framework for building web applications.",
     link: "https://angular.dev/",
     type: "framework",
-    icon: "devicon-angular-plain",
+    icon: "/src/assets/icons/angular.svg",
   },
   {
     tech: "bash",
@@ -39,7 +39,7 @@ const techList: Tech[] = [
     desc: "A Unix shell and command language.",
     link: "https://www.gnu.org/software/bash/",
     type: "tools",
-    icon: "devicon-bash-plain",
+    icon: "/src/assets/icons/bash.svg",
   },
   {
     tech: "better-auth",
@@ -47,7 +47,7 @@ const techList: Tech[] = [
     desc: "An authentication library for TypeScript.",
     link: "https://www.better-auth.com/",
     type: "auth",
-    icon: "devicon-typescript-plain", // Fallback
+    icon: "/src/assets/icons/better-auth.svg",
   },
   {
     tech: "bun",
@@ -55,7 +55,7 @@ const techList: Tech[] = [
     desc: "A fast all-in-one JavaScript runtime.",
     link: "https://bun.sh/",
     type: "framework",
-    icon: "devicon-bun-plain",
+    icon: "/src/assets/icons/bun.svg",
   },
   {
     tech: "c",
@@ -63,7 +63,7 @@ const techList: Tech[] = [
     desc: "A general-purpose programming language.",
     link: "https://en.wikipedia.org/wiki/C_(programming_language)",
     type: "language",
-    icon: "devicon-c-plain",
+    icon: "/src/assets/icons/c.svg",
   },
   {
     tech: "chartjs",
@@ -71,7 +71,7 @@ const techList: Tech[] = [
     desc: "A simple and flexible JavaScript charting library",
     link: "https://www.chartjs.org/",
     type: "library",
-    icon: "devicon-javascript-plain", // Fallback
+    icon: "/src/assets/icons/chartjs.svg",
   },
   {
     tech: "csharp",
@@ -79,7 +79,7 @@ const techList: Tech[] = [
     desc: "A modern, object-oriented programming language developed by Microsoft.",
     link: "https://learn.microsoft.com/en-us/dotnet/csharp/",
     type: "language",
-    icon: "devicon-csharp-plain",
+    icon: "/src/assets/icons/csharp.svg",
   },
   {
     tech: "cpp",
@@ -87,7 +87,7 @@ const techList: Tech[] = [
     desc: "A general-purpose programming language with performance in mind.",
     link: "https://en.cppreference.com/w/",
     type: "language",
-    icon: "devicon-cplusplus-plain",
+    icon: "/src/assets/icons/cpp.svg",
   },
   {
     tech: "css",
@@ -95,7 +95,7 @@ const techList: Tech[] = [
     desc: "Style sheet language used for describing the presentation of a document.",
     link: "https://developer.mozilla.org/en-US/docs/Web/CSS",
     type: "language",
-    icon: "devicon-css3-plain",
+    icon: "/src/assets/icons/css.svg",
   },
   {
     tech: "elysia",
@@ -103,7 +103,7 @@ const techList: Tech[] = [
     desc: "A web framework for building fast and scalable applications.",
     link: "https://elysiajs.com/",
     type: "framework",
-    icon: "devicon-typescript-plain", // Fallback
+    icon: "/src/assets/icons/elysia.svg",
   },
   {
     tech: "express",
@@ -111,7 +111,7 @@ const techList: Tech[] = [
     desc: "Fast, unopinionated, minimalist web framework for Node.js.",
     link: "https://expressjs.com/",
     type: "framework",
-    icon: "devicon-express-original",
+    icon: "/src/assets/icons/express.svg",
   },
   {
     tech: "figma",
@@ -119,7 +119,7 @@ const techList: Tech[] = [
     desc: "A web-based design tool for UI/UX collaboration.",
     link: "https://www.figma.com/",
     type: "tools",
-    icon: "devicon-figma-plain",
+    icon: "/src/assets/icons/figma.svg",
   },
   {
     tech: "git",
@@ -127,7 +127,7 @@ const techList: Tech[] = [
     desc: "A distributed version-control system for tracking changes.",
     link: "https://git-scm.com/",
     type: "tools",
-    icon: "devicon-git-plain",
+    icon: "/src/assets/icons/git.svg",
   },
   {
     tech: "github",
@@ -135,7 +135,7 @@ const techList: Tech[] = [
     desc: "A platform for hosting and reviewing code, managing projects, and building software.",
     link: "https://github.com/",
     type: "tools",
-    icon: "devicon-github-original",
+    icon: "/src/assets/icons/github.svg",
   },
   {
     tech: "html",
@@ -143,7 +143,7 @@ const techList: Tech[] = [
     desc: "The standard markup language for documents designed to be displayed in a web browser.",
     link: "https://developer.mozilla.org/en-US/docs/Web/HTML",
     type: "language",
-    icon: "devicon-html5-plain",
+    icon: "/src/assets/icons/html.svg",
   },
   {
     tech: "java",
@@ -151,7 +151,7 @@ const techList: Tech[] = [
     desc: "A class-based, object-oriented programming language.",
     link: "https://www.java.com/",
     type: "language",
-    icon: "devicon-java-plain",
+    icon: "/src/assets/icons/java.svg",
   },
   {
     tech: "javascript",
@@ -159,7 +159,7 @@ const techList: Tech[] = [
     desc: "A high-level, often just-in-time compiled, and multi-paradigm programming language.",
     link: "https://developer.mozilla.org/en-US/docs/Web/JavaScript",
     type: "language",
-    icon: "devicon-javascript-plain",
+    icon: "/src/assets/icons/javascript.svg",
   },
   {
     tech: "lucide",
@@ -167,7 +167,7 @@ const techList: Tech[] = [
     desc: "A simple, consistent icon library.",
     link: "https://lucide.dev/",
     type: "library",
-    icon: "devicon-react-original", // Fallback
+    icon: "/src/assets/icons/lucide.svg",
   },
   {
     tech: "mongodb",
@@ -175,7 +175,7 @@ const techList: Tech[] = [
     desc: "A document-oriented NoSQL database.",
     link: "https://www.mongodb.com/",
     type: "database",
-    icon: "devicon-mongodb-plain",
+    icon: "/src/assets/icons/mongodb.svg",
   },
   {
     tech: "motion",
@@ -183,7 +183,7 @@ const techList: Tech[] = [
     desc: "A production-grade animation library for the web.",
     link: "https://motion.dev/",
     type: "library",
-    icon: "devicon-react-original", // Fallback
+    icon: "/src/assets/icons/motion.svg",
   },
   {
     tech: "mysql",
@@ -191,7 +191,7 @@ const techList: Tech[] = [
     desc: "An open-source relational database management system.",
     link: "https://www.mysql.com/",
     type: "database",
-    icon: "devicon-mysql-plain",
+    icon: "/src/assets/icons/mysql.svg",
   },
   {
     tech: "nestjs",
@@ -199,7 +199,7 @@ const techList: Tech[] = [
     desc: "A progressive Node.js framework for building efficient, reliable and scalable server-side applications.",
     link: "https://nestjs.com/",
     type: "framework",
-    icon: "devicon-nestjs-original",
+    icon: "/src/assets/icons/nestjs.svg",
   },
   {
     tech: "nextAuth",
@@ -207,7 +207,7 @@ const techList: Tech[] = [
     desc: "Authentication for Next.js applications.",
     link: "https://next-auth.js.org/",
     type: "auth",
-    icon: "devicon-nextjs-plain",
+    icon: "/src/assets/icons/nextAuth.svg",
   },
   {
     tech: "nextjs",
@@ -215,7 +215,7 @@ const techList: Tech[] = [
     desc: "The React framework for production.",
     link: "https://nextjs.org/",
     type: "framework",
-    icon: "devicon-nextjs-plain",
+    icon: "/src/assets/icons/nextjs.svg",
   },
   {
     tech: "nodejs",
@@ -223,7 +223,7 @@ const techList: Tech[] = [
     desc: "A JavaScript runtime built on Chrome's V8 JavaScript engine.",
     link: "https://nodejs.org/",
     type: "framework",
-    icon: "devicon-nodejs-plain",
+    icon: "/src/assets/icons/nodejs.svg",
   },
   {
     tech: "nuqs",
@@ -231,7 +231,7 @@ const techList: Tech[] = [
     desc: "Type-safe search params state manager for React.",
     link: "https://nuqs.dev/",
     type: "library",
-    icon: "devicon-react-original", // Fallback
+    icon: "/src/assets/icons/nuqs.svg",
   },
   {
     tech: "php",
@@ -239,7 +239,7 @@ const techList: Tech[] = [
     desc: "A popular general-purpose scripting language especially suited to web development.",
     link: "https://www.php.net/",
     type: "language",
-    icon: "devicon-php-plain",
+    icon: "/src/assets/icons/php.svg",
   },
   {
     tech: "pnpm",
@@ -247,7 +247,7 @@ const techList: Tech[] = [
     desc: "A fast, disk space efficient package manager.",
     link: "https://pnpm.io/",
     type: "tools",
-    icon: "devicon-pnpm-plain",
+    icon: "/src/assets/icons/pnpm.svg",
   },
   {
     tech: "postgreSQL",
@@ -255,7 +255,7 @@ const techList: Tech[] = [
     desc: "A powerful, open source object-relational database system.",
     link: "https://www.postgresql.org/",
     type: "database",
-    icon: "devicon-postgresql-plain",
+    icon: "/src/assets/icons/postgreSQL.svg",
   },
   {
     tech: "powershell",
@@ -263,7 +263,7 @@ const techList: Tech[] = [
     desc: "A task automation and configuration management framework from Microsoft.",
     link: "https://learn.microsoft.com/powershell/",
     type: "tools",
-    icon: "devicon-powershell-plain",
+    icon: "/src/assets/icons/powershell.svg",
   },
   {
     tech: "prisma",
@@ -271,7 +271,7 @@ const techList: Tech[] = [
     desc: "A next-generation ORM for Node.js and TypeScript.",
     link: "https://www.prisma.io/docs/orm",
     type: "database",
-    icon: "devicon-prisma-original",
+    icon: "/src/assets/icons/prisma.svg",
   },
   {
     tech: "react",
@@ -279,7 +279,7 @@ const techList: Tech[] = [
     desc: "A JavaScript library for building user interfaces.",
     link: "https://react.dev/",
     type: "library",
-    icon: "devicon-react-original",
+    icon: "/src/assets/icons/react.svg",
   },
   {
     tech: "redis",
@@ -287,7 +287,7 @@ const techList: Tech[] = [
     desc: "An in-memory data structure store used as a database, cache and message broker.",
     link: "https://redis.io/",
     type: "database",
-    icon: "devicon-redis-plain",
+    icon: "/src/assets/icons/redis.svg",
   },
   {
     tech: "shadcn-ui",
@@ -295,7 +295,7 @@ const techList: Tech[] = [
     desc: "A component library for building user interfaces.",
     link: "https://ui.shadcn.com/",
     type: "library",
-    icon: "devicon-react-original", // Fallback
+    icon: "/src/assets/icons/shadcn-ui.svg",
   },
   {
     tech: "socket.io",
@@ -303,7 +303,7 @@ const techList: Tech[] = [
     desc: "A library that enables low-latency, bidirectional and event-based communication.",
     link: "https://socket.io/",
     type: "library",
-    icon: "devicon-socketio-original",
+    icon: "/src/assets/icons/socket.io.svg",
   },
   {
     tech: "tailwindcss",
@@ -311,7 +311,7 @@ const techList: Tech[] = [
     desc: "A utility-first CSS framework for rapidly building custom user interfaces.",
     link: "https://tailwindcss.com/",
     type: "library",
-    icon: "devicon-tailwindcss-original",
+    icon: "/src/assets/icons/tailwindcss.svg",
   },
   {
     tech: "typescript",
@@ -319,7 +319,7 @@ const techList: Tech[] = [
     desc: "A typed superset of JavaScript that makes JavaScript my favorite language.",
     link: "https://www.typescriptlang.org/",
     type: "language",
-    icon: "devicon-typescript-plain",
+    icon: "/src/assets/icons/typescript.svg",
   },
   {
     tech: "webrtc",
@@ -327,7 +327,7 @@ const techList: Tech[] = [
     desc: "An open framework for the web that enables Real-Time Communications (RTC).",
     link: "https://webrtc.org/",
     type: "library",
-    icon: "devicon-javascript-plain", // Fallback
+    icon: "/src/assets/icons/webrtc.svg",
   },
   {
     tech: "dotnet",
@@ -335,7 +335,7 @@ const techList: Tech[] = [
     desc: "A free, open-source, cross-platform framework for building modern apps and powerful cloud services.",
     link: "https://dotnet.microsoft.com/",
     type: "framework",
-    icon: "devicon-dotnetcore-plain",
+    icon: "/src/assets/icons/dotnet.svg",
   },
   {
     tech: "yarn",
@@ -343,7 +343,7 @@ const techList: Tech[] = [
     desc: "A fast, reliable, and secure dependency management tool.",
     link: "https://yarnpkg.com/",
     type: "tools",
-    icon: "devicon-yarn-plain",
+    icon: "/src/assets/icons/yarn.svg",
   },
 ];
 
