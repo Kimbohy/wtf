@@ -13,7 +13,6 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { Input } from "../components/ui/input";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
   Tooltip,
   TooltipContent,
@@ -85,12 +84,11 @@ export function ProjectListPage() {
     }
 
     return (
-      <Avatar className="h-12 w-12 rounded-lg">
-        <AvatarImage src={project.icon} alt={project.name} />
-        <AvatarFallback className="rounded-lg">
-          {project.name.substring(0, 2).toUpperCase()}
-        </AvatarFallback>
-      </Avatar>
+      <img
+        src={project.icon}
+        alt={project.name}
+        className="h-12 w-12 rounded-lg object-cover"
+      />
     );
   };
 
@@ -178,7 +176,8 @@ export function ProjectListPage() {
               {filteredProjects.map((project) => (
                 <Card
                   key={project.id}
-                  className="group flex flex-col hover:shadow-lg transition-all duration-200 hover:border-primary/50"
+                  className="group flex flex-col hover:shadow-lg transition-all duration-200 hover:border-primary/50 cursor-pointer"
+                  onClick={() => navigate(`/projects/${project.id}`)}
                 >
                   <CardHeader className="pb-3">
                     <div className="flex items-start gap-3">
@@ -244,14 +243,14 @@ export function ProjectListPage() {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (project.githubRepo) {
+                                window.open(project.githubRepo, "_blank");
+                              }
+                            }}
                           >
-                            <a
-                              href={project.githubRepo}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                            >
-                              <Github className="h-4 w-4" />
-                            </a>
+                            <Github className="h-4 w-4" />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>
@@ -266,9 +265,10 @@ export function ProjectListPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8"
-                          onClick={() =>
-                            navigate(`/projects/${project.id}/edit`)
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/projects/${project.id}/edit`);
+                          }}
                         >
                           <Edit className="h-4 w-4" />
                         </Button>
@@ -283,7 +283,10 @@ export function ProjectListPage() {
                           variant="ghost"
                           size="icon"
                           className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-                          onClick={() => handleDeleteProject(project.id)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteProject(project.id);
+                          }}
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
