@@ -34,14 +34,30 @@ import {
   ImagePlus,
   Trash2,
   Image as ImageIcon,
+  Sun,
+  Moon,
+  Copy,
 } from "lucide-react";
 import { ThemeToggle } from "../components/theme-toggle";
+import { useTheme } from "../components/theme-provider";
 import { cn } from "../lib/utils";
+import { Switch } from "@/components/ui/switch";
+
+// Helper to get the actual resolved theme
+const getResolvedTheme = (theme: string): "light" | "dark" => {
+  if (theme === "system") {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
+  }
+  return theme as "light" | "dark";
+};
 
 export function ProjectFormPage() {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditing = !!id;
+  const { theme } = useTheme();
 
   const iconInputRef = useRef<HTMLInputElement>(null);
   const imagesInputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +67,8 @@ export function ProjectFormPage() {
     name: "",
     description: "",
     githubRepo: "",
-    icon: "",
+    iconLight: "",
+    iconDark: "",
     techStack: [] as string[],
     images: [] as string[],
     startDate: new Date().toISOString().split("T")[0],
@@ -59,6 +76,9 @@ export function ProjectFormPage() {
   const [saving, setSaving] = useState(false);
   const [iconDragActive, setIconDragActive] = useState(false);
   const [imagesDragActive, setImagesDragActive] = useState(false);
+  const [iconPreviewMode, setIconPreviewMode] = useState<"light" | "dark">(() =>
+    getResolvedTheme(theme),
+  );
 
   useEffect(() => {
     if (isEditing) {
@@ -75,7 +95,8 @@ export function ProjectFormPage() {
           name: project.name,
           description: project.description || "",
           githubRepo: project.githubRepo || "",
-          icon: project.icon || "",
+          iconLight: project.iconLight || "",
+          iconDark: project.iconDark || "",
           techStack: project.techStack || [],
           images: project.images || [],
           startDate:
@@ -96,7 +117,8 @@ export function ProjectFormPage() {
         name: formData.name,
         description: formData.description || undefined,
         githubRepo: formData.githubRepo || undefined,
-        icon: formData.icon || undefined,
+        iconLight: formData.iconLight || undefined,
+        iconDark: formData.iconDark || undefined,
         techStack:
           formData.techStack.length > 0 ? formData.techStack : undefined,
         images: formData.images.length > 0 ? formData.images : undefined,
@@ -140,7 +162,22 @@ export function ProjectFormPage() {
     const file = files[0];
     if (!file.type.startsWith("image/")) return;
     const dataUrl = await readFileAsDataURL(file);
-    setFormData((prev) => ({ ...prev, icon: dataUrl }));
+
+    // If no icons exist yet, set both to the same image
+    if (!formData.iconLight && !formData.iconDark) {
+      setFormData((prev) => ({
+        ...prev,
+        iconLight: dataUrl,
+        iconDark: dataUrl,
+      }));
+    } else {
+      // Otherwise, only replace the currently previewed mode
+      if (iconPreviewMode === "light") {
+        setFormData((prev) => ({ ...prev, iconLight: dataUrl }));
+      } else {
+        setFormData((prev) => ({ ...prev, iconDark: dataUrl }));
+      }
+    }
   };
 
   const handleImagesUpload = async (files: FileList | null) => {
@@ -266,8 +303,16 @@ export function ProjectFormPage() {
       <main className="container max-w-7xl mx-auto p-4 md:p-6">
         <div className="grid gap-3 md:gap-4 grid-cols-1 md:grid-cols-6 lg:grid-cols-8 auto-rows-min">
           {/* Project Icon - Compact */}
-          <Card className="md:col-span-2 lg:col-span-2">
-            <CardContent className="p-4">
+          <Card
+            className={cn(
+              "md:col-span-2 lg:col-span-2 relative transition-colors",
+              iconPreviewMode === "light"
+                ? "bg-white text-zinc-900 border-zinc-200"
+                : "bg-[#171717] text-zinc-100 border-zinc-800",
+            )}
+          >
+            <CardContent className="p-4 space-y-3">
+              {/* Hidden file input */}
               <input
                 ref={iconInputRef}
                 type="file"
@@ -276,15 +321,32 @@ export function ProjectFormPage() {
                 className="hidden"
               />
 
-              {formData.icon ? (
+              {/* Show current mode icon or upload area */}
+              {(
+                iconPreviewMode === "light"
+                  ? formData.iconLight
+                  : formData.iconDark
+              ) ? (
                 <div className="relative group">
-                  <div className="aspect-square w-full rounded-lg overflow-hidden border-2 border-dashed border-muted bg-muted/30">
+                  <div
+                    className={cn(
+                      "aspect-square w-full rounded-lg overflow-hidden border-2 border-dashed",
+                      iconPreviewMode === "light"
+                        ? "border-zinc-300"
+                        : "border-zinc-700",
+                    )}
+                  >
                     <img
-                      src={formData.icon}
-                      alt="Project icon"
+                      src={
+                        iconPreviewMode === "light"
+                          ? formData.iconLight
+                          : formData.iconDark
+                      }
+                      alt={`${iconPreviewMode} mode icon`}
                       className="w-full h-full object-cover"
                     />
                   </div>
+                  {/* Hover actions */}
                   <div className="absolute inset-0 flex items-center justify-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-black/60 rounded-lg">
                     <Button
                       type="button"
@@ -300,9 +362,13 @@ export function ProjectFormPage() {
                       size="icon"
                       variant="destructive"
                       className="h-8 w-8"
-                      onClick={() =>
-                        setFormData((prev) => ({ ...prev, icon: "" }))
-                      }
+                      onClick={() => {
+                        if (iconPreviewMode === "light") {
+                          setFormData((prev) => ({ ...prev, iconLight: "" }));
+                        } else {
+                          setFormData((prev) => ({ ...prev, iconDark: "" }));
+                        }
+                      }}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -317,15 +383,82 @@ export function ProjectFormPage() {
                   onClick={() => iconInputRef.current?.click()}
                   className={cn(
                     "aspect-square w-full rounded-lg border-2 border-dashed cursor-pointer transition-colors",
-                    "flex flex-col items-center justify-center gap-1 text-muted-foreground",
-                    "hover:border-primary/50 hover:bg-muted/30",
+                    "flex flex-col items-center justify-center gap-1",
+                    iconPreviewMode === "light"
+                      ? "text-zinc-500 border-zinc-300 hover:border-zinc-400 hover:bg-zinc-100"
+                      : "text-zinc-400 border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800",
                     iconDragActive && "border-primary bg-primary/5",
                   )}
                 >
                   <Upload className="h-6 w-6" />
-                  <span className="text-xs font-medium">Icon</span>
+                  <span className="text-xs font-medium">Upload Icon</span>
+                  {/* If the other mode has an icon, show "Use same" option */}
+                  {(iconPreviewMode === "light"
+                    ? formData.iconDark
+                    : formData.iconLight) && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      className={cn(
+                        "mt-2 h-7 text-xs",
+                        iconPreviewMode === "light"
+                          ? "text-zinc-600 hover:text-zinc-900 hover:bg-zinc-200"
+                          : "text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800",
+                      )}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (iconPreviewMode === "light") {
+                          setFormData((prev) => ({
+                            ...prev,
+                            iconLight: prev.iconDark,
+                          }));
+                        } else {
+                          setFormData((prev) => ({
+                            ...prev,
+                            iconDark: prev.iconLight,
+                          }));
+                        }
+                      }}
+                    >
+                      <Copy className="h-3 w-3 mr-1" />
+                      Use {iconPreviewMode === "light" ? "dark" : "light"} icon
+                    </Button>
+                  )}
                 </div>
               )}
+
+              {/* Theme toggle buttons */}
+              <div className="flex gap-1 justify-end">
+                <Sun
+                  className={cn(
+                    "h-4 w-4",
+                    iconPreviewMode === "light"
+                      ? "text-yellow-500"
+                      : "text-zinc-400",
+                  )}
+                />
+                <Switch
+                  defaultChecked={iconPreviewMode === "light"}
+                  checked={iconPreviewMode === "dark"}
+                  onCheckedChange={(checked) =>
+                    setIconPreviewMode(checked ? "dark" : "light")
+                  }
+                  className={cn(
+                    iconPreviewMode === "light"
+                      ? "data-checked:bg-zinc-800! data-unchecked:bg-zinc-300! [&>span]:bg-with! [&>span]:data-checked:bg-with!"
+                      : "data-checked:bg-zinc-200! data-unchecked:bg-zinc-700! [&>span]:bg-[#171717]! [&>span]:data-checked:bg-[#171717]!",
+                  )}
+                />
+                <Moon
+                  className={cn(
+                    "h-4 w-4",
+                    iconPreviewMode === "dark"
+                      ? "text-blue-500"
+                      : "text-zinc-400",
+                  )}
+                />
+              </div>
             </CardContent>
           </Card>
 

@@ -14,7 +14,6 @@ import {
   DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogTrigger,
 } from "../components/ui/dialog";
 import {
   ArrowLeft,
@@ -148,12 +147,21 @@ export function ProjectDetailPage() {
           {/* Project Icon */}
           <Card className="md:col-span-2 lg:col-span-2">
             <CardContent className="p-6 flex items-center justify-center">
-              {project.icon ? (
-                <img
-                  src={project.icon}
-                  alt={`${project.name} Icon`}
-                  className="w-full h-full max-w-50 max-h-50 rounded-xl object-contain"
-                />
+              {project.iconLight || project.iconDark ? (
+                <>
+                  {/* Light mode - use iconLight or fallback to iconDark */}
+                  <img
+                    src={(project.iconLight || project.iconDark)!}
+                    alt={`${project.name} Icon`}
+                    className="w-full h-full max-w-50 max-h-50 rounded-xl object-contain dark:hidden"
+                  />
+                  {/* Dark mode - use iconDark or fallback to iconLight */}
+                  <img
+                    src={(project.iconDark || project.iconLight)!}
+                    alt={`${project.name} Icon`}
+                    className="w-full h-full max-w-50 max-h-50 rounded-xl object-contain hidden dark:block"
+                  />
+                </>
               ) : (
                 <div className="w-full aspect-square rounded-xl bg-muted flex items-center justify-center max-w-50">
                   <FolderKanban className="h-16 w-16 text-muted-foreground" />

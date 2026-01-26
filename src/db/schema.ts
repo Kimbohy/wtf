@@ -5,7 +5,8 @@ export const projects = sqliteTable("projects", {
   id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   description: text("description"),
-  icon: text("icon"), // Base64 image data URL
+  iconLight: text("icon_light"), // Base64 image data URL for light mode
+  iconDark: text("icon_dark"), // Base64 image data URL for dark mode
   images: text("images", { mode: "json" }).$type<string[]>(), // Array of base64 image data URLs (screenshots)
   techStack: text("tech_stack", { mode: "json" }).$type<string[]>(),
   githubRepo: text("github_repo"),

@@ -75,7 +75,9 @@ export function ProjectListPage() {
   );
 
   const renderProjectIcon = (project: Project) => {
-    if (!project.icon) {
+    const hasIcons = project.iconLight || project.iconDark;
+
+    if (!hasIcons) {
       return (
         <div className="h-12 w-12 rounded-lg bg-muted flex items-center justify-center">
           <FolderKanban className="h-6 w-6 text-muted-foreground" />
@@ -83,12 +85,23 @@ export function ProjectListPage() {
       );
     }
 
+    // Use iconLight for light mode, iconDark for dark mode, fallback to whichever exists
+    const lightIcon = project.iconLight || project.iconDark;
+    const darkIcon = project.iconDark || project.iconLight;
+
     return (
-      <img
-        src={project.icon}
-        alt={project.name}
-        className="h-12 w-12 rounded-lg object-cover"
-      />
+      <>
+        <img
+          src={lightIcon!}
+          alt={project.name}
+          className="h-12 w-12 rounded-lg object-cover dark:hidden"
+        />
+        <img
+          src={darkIcon!}
+          alt={project.name}
+          className="h-12 w-12 rounded-lg object-cover hidden dark:block"
+        />
+      </>
     );
   };
 
