@@ -19,17 +19,16 @@ import {
   ArrowLeft,
   Github,
   Calendar,
-  Loader2,
   Edit,
   Trash2,
   FolderKanban,
   ExternalLink,
-  X,
   Maximize2,
-  ChevronLeft,
-  ChevronRight,
 } from "lucide-react";
-import { ThemeToggle } from "../components/theme-toggle";
+import { ProjectIcon } from "../components/project/ProjectIcon";
+import { ImageGalleryDialog } from "../components/project/ImageGalleryDialog";
+import { PageHeader } from "../components/shared/PageHeader";
+import { LoadingSpinner } from "../components/shared/LoadingSpinner";
 
 export function ProjectDetailPage() {
   const navigate = useNavigate();
@@ -84,14 +83,7 @@ export function ProjectDetailPage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Loading project...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner message="Loading project..." />;
   }
 
   if (!project) {
@@ -100,26 +92,26 @@ export function ProjectDetailPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="flex h-14 items-center px-4 gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate("/")}
-            className="shrink-0"
-          >
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <Separator orientation="vertical" className="h-6" />
-          <div className="flex items-center gap-2 min-w-0">
-            <FolderKanban className="h-5 w-5 shrink-0" />
-            <h1 className="text-lg font-semibold truncate">{project.name}</h1>
-          </div>
-          <div className="flex-1" />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Separator orientation="vertical" className="h-6 hidden sm:block" />
+      <PageHeader
+        leftContent={
+          <>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate("/")}
+              className="shrink-0"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <Separator orientation="vertical" className="h-6" />
+            <div className="flex items-center gap-2 min-w-0">
+              <FolderKanban className="h-5 w-5 shrink-0" />
+              <h1 className="text-lg font-semibold truncate">{project.name}</h1>
+            </div>
+          </>
+        }
+        rightContent={
+          <>
             <Button
               variant="outline"
               size="sm"
@@ -137,9 +129,9 @@ export function ProjectDetailPage() {
               <Trash2 className="h-4 w-4 sm:mr-2" />
               <span className="hidden sm:inline">Delete</span>
             </Button>
-          </div>
-        </div>
-      </header>
+          </>
+        }
+      />
 
       {/* Content - Simple Bento Grid */}
       <main className="container max-w-7xl mx-auto p-4 md:p-6">
@@ -147,26 +139,7 @@ export function ProjectDetailPage() {
           {/* Project Icon */}
           <Card className="md:col-span-2 lg:col-span-2">
             <CardContent className="p-6 flex items-center justify-center">
-              {project.iconLight || project.iconDark ? (
-                <>
-                  {/* Light mode - use iconLight or fallback to iconDark */}
-                  <img
-                    src={(project.iconLight || project.iconDark)!}
-                    alt={`${project.name} Icon`}
-                    className="w-full h-full max-w-50 max-h-50 rounded-xl object-contain dark:hidden"
-                  />
-                  {/* Dark mode - use iconDark or fallback to iconLight */}
-                  <img
-                    src={(project.iconDark || project.iconLight)!}
-                    alt={`${project.name} Icon`}
-                    className="w-full h-full max-w-50 max-h-50 rounded-xl object-contain hidden dark:block"
-                  />
-                </>
-              ) : (
-                <div className="w-full aspect-square rounded-xl bg-muted flex items-center justify-center max-w-50">
-                  <FolderKanban className="h-16 w-16 text-muted-foreground" />
-                </div>
-              )}
+              <ProjectIcon project={project} size="md" />
             </CardContent>
           </Card>
 
@@ -292,62 +265,13 @@ export function ProjectDetailPage() {
         </div>
       </main>
 
-      {/* Image Dialog - Enhanced with Navigation */}
-      <Dialog
-        open={selectedImageIndex !== null}
-        onOpenChange={(open) => !open && setSelectedImageIndex(null)}
-      >
-        <DialogContent
-          showCloseButton={false}
-          className="max-w-[80vw]! w-[80vw]! max-h-[95vh]! h-[95vh]! p-0 bg-white/80 border-0! overflow-hidden dark:bg-black/50"
-        >
-          {/* Close Button */}
-          <DialogClose className="absolute right-4 top-4 z-50 rounded-full bg-white/90 backdrop-blur-sm p-2.5 hover:bg-white transition-colors shadow-lg dark:bg-white/80 dark:hover:bg-white">
-            <X className="h-5 w-5 text-black" />
-          </DialogClose>
-
-          {/* Navigation Buttons */}
-          {project?.images &&
-            project.images.length > 1 &&
-            selectedImageIndex !== null && (
-              <>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handlePreviousImage}
-                  className="absolute left-6 top-1/2 -translate-y-1/2 z-50 rounded-2xl bg-white/40 backdrop-blur-sm hover:bg-white transition-all h-14 w-14 shadow-lg dark:hover:bg-white/80"
-                >
-                  <ChevronLeft className="h-7 w-7 text-black" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleNextImage}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 z-50 rounded-2xl bg-white/40 backdrop-blur-sm hover:bg-white transition-all h-14 w-14 shadow-lg dark:hover:bg-white/80"
-                >
-                  <ChevronRight className="h-7 w-7 text-black" />
-                </Button>
-
-                {/* Image Counter */}
-                <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 bg-white/90 dark:bg-white/80 backdrop-blur-sm px-5 py-2.5 rounded-full text-base font-medium text-black shadow-lg">
-                  {selectedImageIndex + 1} / {project.images.length}
-                </div>
-              </>
-            )}
-
-          {/* Image Display */}
-          {selectedImageIndex !== null && project?.images && (
-            <div className="w-full h-full flex items-center justify-center p-4">
-              <img
-                src={project.images[selectedImageIndex]}
-                alt={`Screenshot ${selectedImageIndex + 1}`}
-                className="max-w-full max-h-full w-auto h-auto object-contain rounded-2xl"
-                style={{ maxWidth: "100%", maxHeight: "100%" }}
-              />
-            </div>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ImageGalleryDialog
+        images={project.images || []}
+        selectedIndex={selectedImageIndex}
+        onClose={() => setSelectedImageIndex(null)}
+        onPrevious={handlePreviousImage}
+        onNext={handleNextImage}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
