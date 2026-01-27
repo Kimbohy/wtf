@@ -11,7 +11,14 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
-import { Github, Calendar, Trash2, Edit, FolderKanban } from "lucide-react";
+import {
+  Github,
+  Calendar,
+  Trash2,
+  Edit,
+  FolderKanban,
+  ExternalLink,
+} from "lucide-react";
 
 interface ProjectCardProps {
   project: Project;
@@ -130,6 +137,28 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
             </TooltipTrigger>
             <TooltipContent>
               <p className="text-xs">View on GitHub</p>
+            </TooltipContent>
+          </Tooltip>
+        )}
+        {project.projectLink && (
+          <Tooltip>
+            <TooltipTrigger>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (project.projectLink) {
+                    window.open(project.projectLink, "_blank");
+                  }
+                }}
+              >
+                <ExternalLink className="h-4 w-4" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="text-xs">Visit Project</p>
             </TooltipContent>
           </Tooltip>
         )}

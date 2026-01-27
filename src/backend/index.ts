@@ -1,7 +1,12 @@
+// Load environment variables from .env file
+import { config } from "dotenv";
+config();
+
 import { Elysia } from "elysia";
 import { node } from "@elysiajs/node";
 import { cors } from "@elysiajs/cors";
 import { projectRoutes } from "./routes/projects";
+import { githubRoutes } from "./routes/github";
 
 export const app = new Elysia({
   adapter: node(),
@@ -11,7 +16,7 @@ export const app = new Elysia({
     status: "ok",
     timestamp: new Date().toISOString(),
   }))
-  .group("/api", (app) => app.use(projectRoutes))
+  .group("/api", (app) => app.use(projectRoutes).use(githubRoutes))
   .listen(3000);
 
 export type App = typeof app;

@@ -103,7 +103,35 @@ pnpm db:generate
 # Push schema to database
 
 pnpm db:push
-\`\`\`
+
+````
+
+### GitHub OAuth Setup (Optional)
+
+To enable fetching information from **private** GitHub repositories:
+
+1. **Create a GitHub OAuth App**:
+   - Go to [GitHub Developer Settings](https://github.com/settings/developers)
+   - Click "New OAuth App"
+   - Fill in the details:
+     - **Application name**: WTF - What To Finish (or your choice)
+     - **Homepage URL**: `http://localhost:3000`
+     - **Authorization callback URL**: `http://localhost:3000/api/github/callback`
+   - Click "Register application"
+
+2. **Configure Environment Variables**:
+   ```bash
+   # Copy the example env file
+   cp .env.example .env
+
+   # Edit .env and add your OAuth credentials:
+   GITHUB_CLIENT_ID=your_client_id_here
+   GITHUB_CLIENT_SECRET=your_client_secret_here
+````
+
+3. **Restart the development server** to load the environment variables.
+
+**Note**: GitHub OAuth is **optional** and only needed if you want to fetch data from private repositories. Public repositories can be accessed without authentication.
 
 ### Development
 
@@ -156,24 +184,33 @@ The built application will be in the \`release/\` directory.
 
 ### Current Features
 
-- Display all projects in a clean grid layout
-- Show project details (name, description, tech stack)
-- Display start dates
-- Link to GitHub repositories
+- ✅ Display all projects in a clean grid layout
+- ✅ Show project details (name, description, tech stack)
+- ✅ Display project icons (light & dark mode support)
+- ✅ Upload project screenshots
+- ✅ Display start dates
+- ✅ Link to GitHub repositories
+- ✅ **GitHub Integration** (OAuth)
+  - Connect your GitHub account
+  - Fetch repository information (stars, forks, language, etc.)
+  - Access private repositories
+  - Auto-populate project details from GitHub
+- ✅ Dark/Light theme toggle
+- ✅ Add new projects via UI
+- ✅ Edit existing projects
+- ✅ Delete projects
 
 ### Planned Features
 
-- [ ] Add new projects via UI
-- [ ] Edit existing projects
-- [ ] Delete projects
-- [ ] Fetch GitHub statistics automatically
+- [ ] Fetch GitHub statistics automatically on schedule
 - [ ] Track last modification dates from GitHub API
 - [ ] Search and filter projects
 - [ ] Sort projects by various criteria
 - [ ] Export/Import projects data
-- [ ] Dark/Light theme toggle
 - [ ] Project status indicators
 - [ ] Integration with more Git providers (GitLab, Bitbucket)
+- [ ] Project tags and categories
+- [ ] Rich text editor for descriptions
 
 ## 🔧 Configuration
 
@@ -187,14 +224,25 @@ The SQLite database is stored in the user data directory:
 
 ### API Endpoints
 
-All API endpoints are prefixed with \`/api\`:
+All API endpoints are prefixed with `/api`:
 
-- \`GET /api/health\` - Health check
-- \`GET /api/projects\` - Get all projects
-- \`GET /api/projects/:id\` - Get a specific project
-- \`POST /api/projects\` - Create a new project
-- \`PUT /api/projects/:id\` - Update a project
-- \`DELETE /api/projects/:id\` - Delete a project
+#### Projects
+
+- `GET /api/health` - Health check
+- `GET /api/projects` - Get all projects
+- `GET /api/projects/:id` - Get a specific project
+- `POST /api/projects` - Create a new project
+- `PUT /api/projects/:id` - Update a project
+- `DELETE /api/projects/:id` - Delete a project
+
+#### GitHub Integration
+
+- `GET /api/github/auth-url` - Get GitHub OAuth authorization URL
+- `GET /api/github/callback` - OAuth callback endpoint
+- `GET /api/github/status` - Check GitHub connection status
+- `GET /api/github/token` - Get stored GitHub token
+- `DELETE /api/github/disconnect` - Disconnect GitHub account
+- `POST /api/github/fetch-repo` - Fetch repository information from GitHub
 
 ## 🤝 Contributing
 

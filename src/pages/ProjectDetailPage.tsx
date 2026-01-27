@@ -173,8 +173,8 @@ export function ProjectDetailPage() {
 
           {/* Links */}
           <Card className="md:col-span-6 lg:col-span-5">
-            <CardContent className="p-6">
-              {project.githubRepo ? (
+            <CardContent className="p-6 space-y-3">
+              {project.githubRepo && (
                 <a
                   href={project.githubRepo}
                   target="_blank"
@@ -192,11 +192,88 @@ export function ProjectDetailPage() {
                   </div>
                   <ExternalLink className="h-4 w-4 text-muted-foreground" />
                 </a>
-              ) : (
-                <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                  No links available
-                </div>
               )}
+
+              {project.projectLink && (
+                <a
+                  href={project.projectLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 hover:border-primary/50 transition-all"
+                >
+                  <div className="h-10 w-10 rounded-lg bg-background flex items-center justify-center">
+                    <ExternalLink className="h-5 w-5" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium">Project Website</p>
+                    <p className="text-sm text-muted-foreground truncate">
+                      {project.projectLink}
+                    </p>
+                  </div>
+                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                </a>
+              )}
+
+              {project.githubStats &&
+                (project.githubStats.stars !== undefined ||
+                  project.githubStats.forks !== undefined ||
+                  project.githubStats.commitCount !== undefined ||
+                  project.githubStats.firstCommit ||
+                  project.githubStats.lastCommit) && (
+                  <div className="p-3 rounded-lg border bg-muted/20">
+                    <p className="text-xs font-medium text-muted-foreground mb-2">
+                      GitHub Stats
+                    </p>
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      {project.githubStats.stars !== undefined && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">⭐</span>
+                          <span>{project.githubStats.stars}</span>
+                        </div>
+                      )}
+                      {project.githubStats.forks !== undefined && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">🔱</span>
+                          <span>{project.githubStats.forks}</span>
+                        </div>
+                      )}
+                      {typeof project.githubStats.commitCount === "number" && (
+                        <div className="flex items-center gap-1">
+                          <span className="text-muted-foreground">📝</span>
+                          <span>{project.githubStats.commitCount} commits</span>
+                        </div>
+                      )}
+                      {project.githubStats.firstCommit && (
+                        <div className="col-span-2 pt-1 border-t">
+                          <span className="text-muted-foreground">First: </span>
+                          <span>
+                            {new Date(
+                              project.githubStats.firstCommit,
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                      {project.githubStats.lastCommit && (
+                        <div className="col-span-2">
+                          <span className="text-muted-foreground">Last: </span>
+                          <span>
+                            {new Date(
+                              project.githubStats.lastCommit,
+                            ).toLocaleDateString()}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {!project.githubRepo &&
+                !project.projectLink &&
+                !project.githubStats && (
+                  <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                    No links available
+                  </div>
+                )}
             </CardContent>
           </Card>
 
