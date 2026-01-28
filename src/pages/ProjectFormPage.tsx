@@ -16,6 +16,8 @@ import {
   Github,
   RefreshCw,
   Search,
+  Download,
+  Calendar as CalendarIcon,
 } from "lucide-react";
 import { useTheme } from "../components/theme-provider";
 import { IconUploadCard } from "../components/project/IconUploadCard";
@@ -26,6 +28,15 @@ import { PageHeader } from "../components/shared/PageHeader";
 import { LoadingSpinner } from "../components/shared/LoadingSpinner";
 import { GitHubAuthDialog } from "../components/shared/GitHubAuthDialog";
 import { useToast } from "../components/ui/toast";
+import { ButtonGroup } from "@/components/ui/button-group";
+import { format } from "date-fns";
+
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 
 // Helper to get the actual resolved theme
 const getResolvedTheme = (theme: string): "light" | "dark" => {
@@ -78,6 +89,7 @@ export function ProjectFormPage() {
   const [repoSearchOpen, setRepoSearchOpen] = useState(false);
   const [fetchingGithub, setFetchingGithub] = useState(false);
   const [githubConnected, setGithubConnected] = useState(false);
+  const [hasSuccessfulFetch, setHasSuccessfulFetch] = useState(false);
 
   useEffect(() => {
     if (isEditing) {
@@ -209,6 +221,8 @@ export function ProjectFormPage() {
       ]
         .filter(Boolean)
         .join(" · ");
+
+      setHasSuccessfulFetch(true);
 
       toast({
         title: "✅ Repository fetched!",
@@ -494,15 +508,42 @@ export function ProjectFormPage() {
                 <Label htmlFor="startDate" className="text-xs">
                   Start Date
                 </Label>
-                <Input
-                  id="startDate"
-                  type="date"
-                  value={formData.startDate}
-                  onChange={(e) =>
-                    setFormData({ ...formData, startDate: e.target.value })
-                  }
-                  className="h-9"
-                />
+                <Popover>
+                  <PopoverTrigger
+                    render={
+                      <Button
+                        variant="outline"
+                        data-empty={!formData.startDate}
+                        className="data-[empty=true]:text-muted-foreground justify-start text-left font-normal w-full"
+                      />
+                    }
+                  >
+                    <CalendarIcon />
+                    {formData.startDate ? (
+                      format(new Date(formData.startDate), "PPP")
+                    ) : (
+                      <span>Pick a date</span>
+                    )}
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0">
+                    <Calendar
+                      mode="single"
+                      selected={
+                        formData.startDate
+                          ? new Date(formData.startDate)
+                          : undefined
+                      }
+                      onSelect={(date) =>
+                        setFormData({
+                          ...formData,
+                          startDate: date
+                            ? date.toISOString().split("T")[0]
+                            : "",
+                        })
+                      }
+                    />
+                  </PopoverContent>
+                </Popover>
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
@@ -520,13 +561,14 @@ export function ProjectFormPage() {
                     {githubConnected ? "Connected" : "Connect"}
                   </Button>
                 </div>
-                <div className="flex gap-2">
+                <ButtonGroup className="w-full">
+                  {/* TODO: change this to a Input group */}
                   {!isEditing && (
                     <Button
                       type="button"
                       variant="outline"
                       size="icon"
-                      className="h-9 w-9 shrink-0"
+                      className="h-9 w-9 shrink-0 rounded-r-none"
                       onClick={() => setRepoSearchOpen(true)}
                       title="Search repositories"
                     >
@@ -541,22 +583,30 @@ export function ProjectFormPage() {
                       setFormData({ ...formData, githubRepo: e.target.value })
                     }
                     placeholder="https://github.com/..."
-                    className="h-9"
+                    className={`h-9 ${!isEditing ? "rounded-l-none" : ""}`}
                   />
                   <Button
                     type="button"
                     variant="outline"
                     size="icon"
-                    className="h-9 w-9 shrink-0"
+                    className="h-9 w-9 shrink-0 rounded-l-none border-l-0"
                     onClick={() => handleFetchGithubInfo()}
                     disabled={!formData.githubRepo || fetchingGithub}
-                    title="Fetch repository information"
+                    title={
+                      hasSuccessfulFetch
+                        ? "Refresh repository information"
+                        : "Fetch repository information"
+                    }
                   >
-                    <RefreshCw
-                      className={`h-4 w-4 ${fetchingGithub ? "animate-spin" : ""}`}
-                    />
+                    {fetchingGithub ? (
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                    ) : hasSuccessfulFetch ? (
+                      <RefreshCw className="h-4 w-4" />
+                    ) : (
+                      <Download className="h-4 w-4" />
+                    )}
                   </Button>
-                </div>
+                </ButtonGroup>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="projectLink" className="text-xs">

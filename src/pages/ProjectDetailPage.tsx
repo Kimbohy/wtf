@@ -24,6 +24,9 @@ import {
   FolderKanban,
   ExternalLink,
   Maximize2,
+  GitFork,
+  Star,
+  Bookmark,
 } from "lucide-react";
 import { ProjectIcon } from "../components/project/ProjectIcon";
 import { ImageGalleryDialog } from "../components/project/ImageGalleryDialog";
@@ -214,71 +217,16 @@ export function ProjectDetailPage() {
                 </a>
               )}
 
-              {project.githubStats &&
-                (project.githubStats.stars !== undefined ||
-                  project.githubStats.forks !== undefined ||
-                  project.githubStats.commitCount !== undefined ||
-                  project.githubStats.firstCommit ||
-                  project.githubStats.lastCommit) && (
-                  <div className="p-3 rounded-lg border bg-muted/20">
-                    <p className="text-xs font-medium text-muted-foreground mb-2">
-                      GitHub Stats
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      {project.githubStats.stars !== undefined && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground">⭐</span>
-                          <span>{project.githubStats.stars}</span>
-                        </div>
-                      )}
-                      {project.githubStats.forks !== undefined && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground">🔱</span>
-                          <span>{project.githubStats.forks}</span>
-                        </div>
-                      )}
-                      {typeof project.githubStats.commitCount === "number" && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-muted-foreground">📝</span>
-                          <span>{project.githubStats.commitCount} commits</span>
-                        </div>
-                      )}
-                      {project.githubStats.firstCommit && (
-                        <div className="col-span-2 pt-1 border-t">
-                          <span className="text-muted-foreground">First: </span>
-                          <span>
-                            {new Date(
-                              project.githubStats.firstCommit,
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                      )}
-                      {project.githubStats.lastCommit && (
-                        <div className="col-span-2">
-                          <span className="text-muted-foreground">Last: </span>
-                          <span>
-                            {new Date(
-                              project.githubStats.lastCommit,
-                            ).toLocaleDateString()}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-              {!project.githubRepo &&
-                !project.projectLink &&
-                !project.githubStats && (
-                  <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                    No links available
-                  </div>
-                )}
+              {!project.githubRepo && !project.projectLink && (
+                <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                  No links available
+                </div>
+              )}
             </CardContent>
           </Card>
 
           {/* Tech Stack */}
-          <Card className="md:col-span-6 lg:col-span-12">
+          <Card className="md:col-span-6 lg:col-span-7">
             <CardContent className="p-6">
               {project.techStack && project.techStack.length > 0 ? (
                 <div className="flex flex-wrap gap-3">
@@ -310,6 +258,90 @@ export function ProjectDetailPage() {
               )}
             </CardContent>
           </Card>
+
+          {/* GitHub Stats */}
+          {project.githubStats &&
+            (project.githubStats.stars !== undefined ||
+              project.githubStats.forks !== undefined ||
+              project.githubStats.commitCount !== undefined ||
+              project.githubStats.firstCommit ||
+              project.githubStats.lastCommit) && (
+              <Card className="md:col-span-6 lg:col-span-5">
+                <CardContent className="p-6">
+                  <h3 className="text-sm font-medium mb-4">GitHub Stats</h3>
+                  <div className="space-y-3">
+                    {project.githubStats.stars !== undefined && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Stars
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Star />
+                          <span className="text-sm font-medium min-w-4 text-center">
+                            {project.githubStats.stars}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {project.githubStats.forks !== undefined && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Forks
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <GitFork />
+                          <span className="text-sm font-medium min-w-4 text-center">
+                            {project.githubStats.forks}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {typeof project.githubStats.commitCount === "number" && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Commits
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <Bookmark />
+                          <span className="text-sm font-medium min-w-4 text-center">
+                            {project.githubStats.commitCount}
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                    {(project.githubStats.firstCommit ||
+                      project.githubStats.lastCommit) && (
+                      <div className="pt-2 border-t space-y-2">
+                        {project.githubStats.firstCommit && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              First Commit
+                            </span>
+                            <span className="text-xs">
+                              {new Date(
+                                project.githubStats.firstCommit,
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                        {project.githubStats.lastCommit && (
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">
+                              Last Commit
+                            </span>
+                            <span className="text-xs">
+                              {new Date(
+                                project.githubStats.lastCommit,
+                              ).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
 
           {/* Images */}
           {project.images && project.images.length > 0 && (
