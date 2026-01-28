@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from "../ui/card";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { timeSince } from "../../lib/utils";
 import {
   Github,
   Calendar,
@@ -71,7 +72,7 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
             {project.startDate && (
               <CardDescription className="flex items-center gap-1 text-xs mt-1">
                 <Calendar className="h-3 w-3" />
-                {new Date(project.startDate).toLocaleDateString()}
+                {timeSince(new Date(project.startDate))}
               </CardDescription>
             )}
           </div>

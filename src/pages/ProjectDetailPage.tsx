@@ -276,7 +276,7 @@ export function ProjectDetailPage() {
                           Stars
                         </span>
                         <div className="flex items-center gap-2">
-                          <Star />
+                          <Star className="w-5 h-5" />
                           <span className="text-sm font-medium min-w-4 text-center">
                             {project.githubStats.stars}
                           </span>
@@ -289,7 +289,7 @@ export function ProjectDetailPage() {
                           Forks
                         </span>
                         <div className="flex items-center gap-2">
-                          <GitFork />
+                          <GitFork className="w-5 h-5" />
                           <span className="text-sm font-medium min-w-4 text-center">
                             {project.githubStats.forks}
                           </span>
@@ -302,7 +302,7 @@ export function ProjectDetailPage() {
                           Commits
                         </span>
                         <div className="flex items-center gap-2">
-                          <Bookmark />
+                          <Bookmark className="w-5 h-5" />
                           <span className="text-sm font-medium min-w-4 text-center">
                             {project.githubStats.commitCount}
                           </span>

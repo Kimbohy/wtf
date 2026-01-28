@@ -27,7 +27,6 @@ import { RepoSearchDialog } from "../components/project/RepoSearchDialog";
 import { PageHeader } from "../components/shared/PageHeader";
 import { LoadingSpinner } from "../components/shared/LoadingSpinner";
 import { GitHubAuthDialog } from "../components/shared/GitHubAuthDialog";
-import { useToast } from "../components/ui/toast";
 import { ButtonGroup } from "@/components/ui/button-group";
 import { format } from "date-fns";
 
@@ -37,6 +36,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { toast } from "sonner";
 
 // Helper to get the actual resolved theme
 const getResolvedTheme = (theme: string): "light" | "dark" => {
@@ -53,7 +53,6 @@ export function ProjectFormPage() {
   const { id } = useParams();
   const isEditing = !!id;
   const { theme } = useTheme();
-  const { toast } = useToast();
 
   const [loading, setLoading] = useState(isEditing);
   const [formData, setFormData] = useState({
@@ -145,11 +144,8 @@ export function ProjectFormPage() {
   const handleFetchGithubInfo = async (repoUrlOverride?: string) => {
     const urlToFetch = repoUrlOverride || formData.githubRepo;
     if (!urlToFetch) {
-      toast({
-        title: "Missing URL",
-        description: "Please enter a GitHub repository URL first",
-        variant: "destructive",
-      });
+      toast.warning("Please provide a GitHub repository URL first.");
+
       return;
     }
 
@@ -173,19 +169,13 @@ export function ProjectFormPage() {
       if (data.error) {
         if (data.error.includes("404") && !githubConnected) {
           // Might be a private repo
-          toast({
-            title: "Private Repository?",
-            description:
-              "This might be a private repository. Please connect GitHub to access it.",
-            variant: "destructive",
-            duration: 7000,
-          });
+          toast.warning(
+            "This might be a private repository. Please connect GitHub to access it.",
+          );
           setTimeout(() => setGithubAuthOpen(true), 1500);
         } else {
-          toast({
-            title: "Failed to fetch repository",
+          toast.error("Failed to fetch repository", {
             description: data.error,
-            variant: "destructive",
           });
         }
         return;
@@ -194,8 +184,12 @@ export function ProjectFormPage() {
       // Update form with fetched data
       setFormData((prev) => ({
         ...prev,
-        name: prev.name || data.name,
+        name:
+          prev.name || data.name.charAt(0).toUpperCase() + data.name.slice(1),
         description: prev.description || data.description || "",
+        startDate: data.firstCommit
+          ? new Date(data.firstCommit).toISOString().split("T")[0]
+          : prev.startDate,
         techStack:
           data.language && !prev.techStack.includes(data.language)
             ? [...prev.techStack, data.language]
@@ -213,29 +207,20 @@ export function ProjectFormPage() {
       }));
 
       const commitInfo = data.commitCount ? `${data.commitCount} commits` : "";
-      const description = [
-        `${data.stars} ⭐`,
-        `${data.forks} forks`,
-        data.language || "N/A",
-        commitInfo,
-      ]
+      const description = [data.language || "N/A", commitInfo]
         .filter(Boolean)
         .join(" · ");
 
       setHasSuccessfulFetch(true);
 
-      toast({
-        title: "✅ Repository fetched!",
-        description,
-        variant: "success",
+      toast.success("Repository information fetched", {
+        description: `${data.name} · ${description}`,
       });
     } catch (error: any) {
-      toast({
-        title: "Failed to fetch repository",
+      toast.error("Failed to fetch repository", {
         description:
           error.message ||
           "Could not connect to GitHub API. Please check your internet connection.",
-        variant: "destructive",
       });
     } finally {
       setFetchingGithub(false);
