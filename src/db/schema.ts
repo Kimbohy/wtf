@@ -9,7 +9,7 @@ export const projects = sqliteTable("projects", {
   iconDark: text("icon_dark"), // Base64 image data URL for dark mode
   images: text("images", { mode: "json" }).$type<string[]>(), // Array of base64 image data URLs (screenshots)
   techStack: text("tech_stack", { mode: "json" }).$type<string[]>(),
-  githubRepo: text("github_repo"),
+  githubRepos: text("github_repos", { mode: "json" }).$type<string[]>(), // Array of GitHub repository URLs
   projectLink: text("project_link"), // Deployed project URL
   githubStats: text("github_stats", { mode: "json" }).$type<{
     stars?: number;
@@ -20,7 +20,7 @@ export const projects = sqliteTable("projects", {
     openIssues?: number;
     language?: string;
     defaultBranch?: string;
-  }>(),
+  }>(), // Aggregated stats from all repositories
   startDate: text("start_date"),
   lastModified: text("last_modified"),
   createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),

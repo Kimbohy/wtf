@@ -177,24 +177,34 @@ export function ProjectDetailPage() {
           {/* Links */}
           <Card className="md:col-span-6 lg:col-span-5">
             <CardContent className="p-6 space-y-3">
-              {project.githubRepo && (
-                <a
-                  href={project.githubRepo}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center gap-3 p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 hover:border-primary/50 transition-all"
-                >
-                  <div className="h-10 w-10 rounded-lg bg-background flex items-center justify-center">
-                    <Github className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium">GitHub Repository</p>
-                    <p className="text-sm text-muted-foreground truncate">
-                      {project.githubRepo}
-                    </p>
-                  </div>
-                  <ExternalLink className="h-4 w-4 text-muted-foreground" />
-                </a>
+              {project.githubRepos && project.githubRepos.length > 0 && (
+                <>
+                  {project.githubRepos.map((repo, index) => (
+                    <a
+                      key={index}
+                      href={repo}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 rounded-lg border bg-muted/30 hover:bg-muted/50 hover:border-primary/50 transition-all"
+                    >
+                      <div className="h-10 w-10 rounded-lg bg-background flex items-center justify-center">
+                        <Github className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium">
+                          GitHub Repository{" "}
+                          {(project.githubRepos?.length ?? 0) > 1
+                            ? `#${index + 1}`
+                            : ""}
+                        </p>
+                        <p className="text-sm text-muted-foreground truncate">
+                          {repo}
+                        </p>
+                      </div>
+                      <ExternalLink className="h-4 w-4 text-muted-foreground" />
+                    </a>
+                  ))}
+                </>
               )}
 
               {project.projectLink && (
@@ -217,11 +227,12 @@ export function ProjectDetailPage() {
                 </a>
               )}
 
-              {!project.githubRepo && !project.projectLink && (
-                <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
-                  No links available
-                </div>
-              )}
+              {(!project.githubRepos || project.githubRepos.length === 0) &&
+                !project.projectLink && (
+                  <div className="flex items-center justify-center py-8 text-sm text-muted-foreground">
+                    No links available
+                  </div>
+                )}
             </CardContent>
           </Card>
 

@@ -58,7 +58,7 @@ export function ProjectFormPage() {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    githubRepo: "",
+    githubRepos: [""] as string[],
     projectLink: "",
     iconLight: "",
     iconDark: "",
@@ -115,7 +115,10 @@ export function ProjectFormPage() {
         setFormData({
           name: project.name,
           description: project.description || "",
-          githubRepo: project.githubRepo || "",
+          githubRepos:
+            project.githubRepos && project.githubRepos.length > 0
+              ? project.githubRepos
+              : [""],
           projectLink: project.projectLink || "",
           iconLight: project.iconLight || "",
           iconDark: project.iconDark || "",
@@ -134,90 +137,147 @@ export function ProjectFormPage() {
   };
 
   const handleSelectRepo = (repoUrl: string) => {
-    setFormData((prev) => ({ ...prev, githubRepo: repoUrl }));
+    setFormData((prev) => ({ ...prev, githubRepos: [repoUrl] }));
     // Automatically fetch repo info after selection with the URL
     setTimeout(() => {
-      handleFetchGithubInfo(repoUrl);
+      handleFetchGithubInfo();
     }, 300);
   };
 
-  const handleFetchGithubInfo = async (repoUrlOverride?: string) => {
-    const urlToFetch = repoUrlOverride || formData.githubRepo;
-    if (!urlToFetch) {
-      toast.warning("Please provide a GitHub repository URL first.");
-
+  const handleFetchGithubInfo = async () => {
+    const validRepos = formData.githubRepos.filter((url) => url.trim() !== "");
+    if (validRepos.length === 0) {
+      toast.warning("Please provide at least one GitHub repository URL.");
       return;
     }
 
     setFetchingGithub(true);
     try {
-      const response = await fetch(
-        "http://localhost:3000/api/github/fetch-repo",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ url: urlToFetch }),
-        },
-      );
+      // Fetch data for all valid repositories
+      const fetchPromises = validRepos.map(async (url) => {
+        const response = await fetch(
+          "http://localhost:3000/api/github/fetch-repo",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ url }),
+          },
+        );
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
 
-      const data = await response.json();
+        const data = await response.json();
+        if (data.error) {
+          return { url, error: data.error };
+        }
+        return { url, data };
+      });
 
-      if (data.error) {
-        if (data.error.includes("404") && !githubConnected) {
-          // Might be a private repo
+      const results = await Promise.all(fetchPromises);
+
+      // Check for errors
+      const errors = results.filter((r) => r.error);
+      if (errors.length > 0) {
+        if (errors.some((e) => e.error.includes("404")) && !githubConnected) {
           toast.warning(
-            "This might be a private repository. Please connect GitHub to access it.",
+            "Some repositories might be private. Please connect GitHub to access them.",
           );
           setTimeout(() => setGithubAuthOpen(true), 1500);
         } else {
-          toast.error("Failed to fetch repository", {
-            description: data.error,
+          toast.error("Failed to fetch some repositories", {
+            description: errors.map((e) => e.error).join(", "),
           });
         }
+        // Continue with successful fetches
+      }
+
+      const successfulResults = results.filter((r) => r.data);
+
+      if (successfulResults.length === 0) {
         return;
       }
 
-      // Update form with fetched data
-      setFormData((prev) => ({
-        ...prev,
-        name:
-          prev.name || data.name.charAt(0).toUpperCase() + data.name.slice(1),
-        description: prev.description || data.description || "",
-        startDate: data.firstCommit
-          ? new Date(data.firstCommit).toISOString().split("T")[0]
-          : prev.startDate,
-        techStack:
-          data.language && !prev.techStack.includes(data.language)
-            ? [...prev.techStack, data.language]
-            : prev.techStack,
-        githubStats: {
-          stars: data.stars,
-          forks: data.forks,
-          firstCommit: data.firstCommit,
-          lastCommit: data.lastCommit,
-          commitCount: data.commitCount,
-          openIssues: data.openIssues,
-          language: data.language,
-          defaultBranch: data.defaultBranch,
-        },
-      }));
+      // Aggregate stats from all repositories
+      let totalStars = 0;
+      let totalForks = 0;
+      let totalCommitCount = 0;
+      let totalOpenIssues = 0;
+      let earliestCommit: string | null = null;
+      let latestCommit: string | null = null;
+      const languages = new Set<string>();
 
-      const commitInfo = data.commitCount ? `${data.commitCount} commits` : "";
-      const description = [data.language || "N/A", commitInfo]
-        .filter(Boolean)
-        .join(" · ");
+      successfulResults.forEach(({ data }) => {
+        totalStars += data.stars || 0;
+        totalForks += data.forks || 0;
+        totalCommitCount += data.commitCount || 0;
+        totalOpenIssues += data.openIssues || 0;
+
+        if (data.firstCommit) {
+          if (
+            !earliestCommit ||
+            new Date(data.firstCommit) < new Date(earliestCommit)
+          ) {
+            earliestCommit = data.firstCommit;
+          }
+        }
+
+        if (data.lastCommit) {
+          if (
+            !latestCommit ||
+            new Date(data.lastCommit) > new Date(latestCommit)
+          ) {
+            latestCommit = data.lastCommit;
+          }
+        }
+
+        if (data.language) {
+          languages.add(data.language);
+        }
+      });
+
+      // Update form with aggregated data
+      setFormData((prev) => {
+        const firstRepo = successfulResults[0].data;
+        return {
+          ...prev,
+          name:
+            prev.name ||
+            firstRepo.name.charAt(0).toUpperCase() + firstRepo.name.slice(1),
+          description: prev.description || firstRepo.description || "",
+          startDate: earliestCommit
+            ? new Date(earliestCommit).toISOString().split("T")[0]
+            : prev.startDate,
+          techStack: [
+            ...prev.techStack,
+            ...Array.from(languages).filter(
+              (lang) => !prev.techStack.includes(lang),
+            ),
+          ],
+          githubStats: {
+            stars: totalStars,
+            forks: totalForks,
+            firstCommit: earliestCommit || undefined,
+            lastCommit: latestCommit || undefined,
+            commitCount: totalCommitCount,
+            openIssues: totalOpenIssues,
+            language: Array.from(languages).join(", "),
+            defaultBranch: successfulResults[0].data.defaultBranch,
+          },
+        };
+      });
 
       setHasSuccessfulFetch(true);
 
-      toast.success("Repository information fetched", {
-        description: `${data.name} · ${description}`,
-      });
+      toast.success(
+        `Fetched ${successfulResults.length} ${successfulResults.length === 1 ? "repository" : "repositories"}`,
+        {
+          description: `${totalStars} stars · ${totalCommitCount} commits`,
+        },
+      );
     } catch (error: any) {
-      toast.error("Failed to fetch repository", {
+      toast.error("Failed to fetch repositories", {
         description:
           error.message ||
           "Could not connect to GitHub API. Please check your internet connection.",
@@ -230,10 +290,13 @@ export function ProjectFormPage() {
   const handleSaveProject = async () => {
     setSaving(true);
     try {
+      const validRepos = formData.githubRepos.filter(
+        (url) => url.trim() !== "",
+      );
       const projectData = {
         name: formData.name,
         description: formData.description || undefined,
-        githubRepo: formData.githubRepo || undefined,
+        githubRepos: validRepos.length > 0 ? validRepos : undefined,
         projectLink: formData.projectLink || undefined,
         githubStats: formData.githubStats || undefined,
         iconLight: formData.iconLight || undefined,
@@ -532,9 +595,7 @@ export function ProjectFormPage() {
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="githubRepo" className="text-xs">
-                    GitHub Repository
-                  </Label>
+                  <Label className="text-xs">GitHub Repositories</Label>
                   <Button
                     type="button"
                     variant="ghost"
@@ -546,52 +607,97 @@ export function ProjectFormPage() {
                     {githubConnected ? "Connected" : "Connect"}
                   </Button>
                 </div>
-                <ButtonGroup className="w-full">
-                  {/* TODO: change this to a Input group */}
-                  {!isEditing && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="icon"
-                      className="h-9 w-9 shrink-0 rounded-r-none"
-                      onClick={() => setRepoSearchOpen(true)}
-                      title="Search repositories"
-                    >
-                      <Search className="h-4 w-4" />
-                    </Button>
-                  )}
-                  <Input
-                    id="githubRepo"
-                    type="url"
-                    value={formData.githubRepo}
-                    onChange={(e) =>
-                      setFormData({ ...formData, githubRepo: e.target.value })
-                    }
-                    placeholder="https://github.com/..."
-                    className={`h-9 ${!isEditing ? "rounded-l-none" : ""}`}
-                  />
+                <div className="space-y-2">
+                  {formData.githubRepos.map((repo, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <ButtonGroup key={index} className="w-full">
+                        {!isEditing && (
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            className="h-9 w-9 shrink-0 rounded-r-none"
+                            onClick={() => setRepoSearchOpen(true)}
+                            title="Search repositories"
+                          >
+                            <Search className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Input
+                          type="url"
+                          value={repo}
+                          onChange={(e) => {
+                            const newRepos = [...formData.githubRepos];
+                            newRepos[index] = e.target.value;
+                            setFormData({ ...formData, githubRepos: newRepos });
+                          }}
+                          placeholder="https://github.com/..."
+                          className={`h-9 ${!isEditing ? "rounded-none border-l-0" : "rounded-r-none"}`}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          className="h-9 w-9 shrink-0 rounded-none border-l-0"
+                          onClick={() => handleFetchGithubInfo()}
+                          disabled={!repo.trim() || fetchingGithub}
+                          title={
+                            hasSuccessfulFetch
+                              ? "Refresh repository information"
+                              : "Fetch repository information"
+                          }
+                        >
+                          {fetchingGithub ? (
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                          ) : hasSuccessfulFetch ? (
+                            <RefreshCw className="h-4 w-4" />
+                          ) : (
+                            <Download className="h-4 w-4" />
+                          )}
+                        </Button>
+                      </ButtonGroup>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        className="h-9 w-9 shrink-0"
+                        disabled={formData.githubRepos.length === 1}
+                        onClick={() => {
+                          if (formData.githubRepos.length === 1) {
+                            // If only one repo, clear it instead of removing
+                            setFormData({ ...formData, githubRepos: [""] });
+                          } else {
+                            const newRepos = formData.githubRepos.filter(
+                              (_, i) => i !== index,
+                            );
+                            setFormData({ ...formData, githubRepos: newRepos });
+                          }
+                        }}
+                        title="Remove repository"
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon"
-                    className="h-9 w-9 shrink-0 rounded-l-none border-l-0"
-                    onClick={() => handleFetchGithubInfo()}
-                    disabled={!formData.githubRepo || fetchingGithub}
-                    title={
-                      hasSuccessfulFetch
-                        ? "Refresh repository information"
-                        : "Fetch repository information"
+                    className="w-full h-9"
+                    disabled={
+                      formData.githubRepos[
+                        formData.githubRepos.length - 1
+                      ].trim() === ""
                     }
+                    onClick={() => {
+                      setFormData({
+                        ...formData,
+                        githubRepos: [...formData.githubRepos, ""],
+                      });
+                    }}
                   >
-                    {fetchingGithub ? (
-                      <RefreshCw className="h-4 w-4 animate-spin" />
-                    ) : hasSuccessfulFetch ? (
-                      <RefreshCw className="h-4 w-4" />
-                    ) : (
-                      <Download className="h-4 w-4" />
-                    )}
+                    + Add Repository
                   </Button>
-                </ButtonGroup>
+                </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="projectLink" className="text-xs">

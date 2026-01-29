@@ -119,25 +119,34 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
       </CardContent>
 
       <CardFooter className="flex gap-2 pt-3 border-t">
-        {project.githubRepo && (
+        {project.githubRepos && project.githubRepos.length > 0 && (
           <Tooltip>
             <TooltipTrigger>
               <Button
                 variant="ghost"
                 size="icon"
-                className="h-8 w-8"
+                className="h-8 w-8 relative"
                 onClick={(e) => {
                   e.stopPropagation();
-                  if (project.githubRepo) {
-                    window.open(project.githubRepo, "_blank");
+                  if (project.githubRepos && project.githubRepos.length > 0) {
+                    window.open(project.githubRepos[0], "_blank");
                   }
                 }}
               >
                 <Github className="h-4 w-4" />
+                {project.githubRepos.length > 1 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
+                    {project.githubRepos.length}
+                  </span>
+                )}
               </Button>
             </TooltipTrigger>
             <TooltipContent>
-              <p className="text-xs">View on GitHub</p>
+              <p className="text-xs">
+                {project.githubRepos.length > 1
+                  ? `View ${project.githubRepos.length} GitHub repositories`
+                  : "View on GitHub"}
+              </p>
             </TooltipContent>
           </Tooltip>
         )}
