@@ -35,7 +35,7 @@ export const projectRoutes = new Elysia({ prefix: "/projects" })
         iconDark: t.Optional(t.String()),
         images: t.Optional(t.Array(t.String())),
         techStack: t.Optional(t.Array(t.String())),
-        githubRepo: t.Optional(t.String()),
+        githubRepos: t.Optional(t.Array(t.String())),
         projectLink: t.Optional(t.String()),
         githubStats: t.Optional(
           t.Object({
@@ -72,7 +72,7 @@ export const projectRoutes = new Elysia({ prefix: "/projects" })
         iconDark: t.Optional(t.String()),
         images: t.Optional(t.Array(t.String())),
         techStack: t.Optional(t.Array(t.String())),
-        githubRepo: t.Optional(t.String()),
+        githubRepos: t.Optional(t.Array(t.String())),
         projectLink: t.Optional(t.String()),
         githubStats: t.Optional(
           t.Object({
