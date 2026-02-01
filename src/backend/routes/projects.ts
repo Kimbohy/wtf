@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { db } from "../../db";
-import { projects } from "../../db/schema";
+import { db } from "../../db/index.js";
+import { projects } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
 
 export const projectRoutes = new Elysia({ prefix: "/projects" })
@@ -24,7 +24,10 @@ export const projectRoutes = new Elysia({ prefix: "/projects" })
   .post(
     "/",
     async ({ body }) => {
-      const newProject = await db.insert(projects).values(body).returning();
+      const newProject = await db
+        .insert(projects)
+        .values(body as any)
+        .returning();
       return { project: newProject[0] };
     },
     {
@@ -58,7 +61,7 @@ export const projectRoutes = new Elysia({ prefix: "/projects" })
     async ({ params, body }) => {
       const updatedProject = await db
         .update(projects)
-        .set({ ...body, updatedAt: new Date().toISOString() })
+        .set({ ...(body as any), updatedAt: new Date().toISOString() })
         .where(eq(projects.id, parseInt(params.id)))
         .returning();
 

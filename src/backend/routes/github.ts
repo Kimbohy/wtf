@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
-import { db } from "../../db";
-import { settings } from "../../db/schema";
+import { db } from "../../db/index.js";
+import { settings } from "../../db/schema.js";
 import { eq } from "drizzle-orm";
 import nodeFetch from "node-fetch";
 import type { RequestInit } from "node-fetch";
@@ -467,7 +467,7 @@ export const githubRoutes = new Elysia({ prefix: "/github" })
   .post(
     "/fetch-repo",
     async ({ body }) => {
-      const { url } = body;
+      const { url } = body as { url: string };
 
       // Parse GitHub URL
       const match = url.match(/github\.com\/([^/]+)\/([^/]+)/);

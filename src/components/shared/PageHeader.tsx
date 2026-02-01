@@ -13,13 +13,13 @@ export function PageHeader({ leftContent, rightContent }: PageHeaderProps) {
       <div className="flex h-14 items-center px-4 gap-4">
         {leftContent}
         <div className="flex-1" />
-        <div className="flex items-center gap-2">
+        <div className="flex h-full items-center gap-2">
           <ThemeToggle />
           {rightContent && (
             <>
               <Separator
                 orientation="vertical"
-                className="h-6 hidden sm:block"
+                className="h-6 hidden sm:block relative top-0"
               />
               {rightContent}
             </>

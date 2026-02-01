@@ -34,6 +34,7 @@ export function ProjectListPage() {
   };
 
   const handleDeleteProject = async (id: number) => {
+    // todo: change the confirm dialog to the shadcn one
     if (confirm("Are you sure you want to delete this project?")) {
       try {
         await api.api.projects({ id }).delete();

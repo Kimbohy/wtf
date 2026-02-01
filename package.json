@@ -3,7 +3,8 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "main": "dist-electron/main.js",
+  "description": "What To Finish is an app that lists all your projects in one place.",
+  "main": "dist-electron/electron/main.js",
   "scripts": {
     "dev": "concurrently \"vite\" \"pnpm dev:backend\"",
     "dev:frontend": "vite",
@@ -26,8 +27,11 @@
     },
     "files": [
       "dist/**/*",
-      "dist-electron/**/*"
+      "dist-electron/**/*",
+      "node_modules/**/*",
+      "drizzle/**/*"
     ],
+    "asar": false,
     "mac": {
       "target": [
         "dmg"
@@ -49,6 +53,7 @@
     "@elysiajs/cors": "^1.4.1",
     "@elysiajs/eden": "^1.4.6",
     "@elysiajs/node": "^1.4.3",
+    "@sinclair/typebox": "^0.34.48",
     "@types/better-sqlite3": "^7.6.13",
     "@types/node-fetch": "^2.6.13",
     "better-sqlite3": "^12.6.2",

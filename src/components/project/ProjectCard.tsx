@@ -20,6 +20,7 @@ import {
   FolderKanban,
   ExternalLink,
 } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
 interface ProjectCardProps {
   project: Project;
@@ -28,6 +29,27 @@ interface ProjectCardProps {
 
 export function ProjectCard({ project, onDelete }: ProjectCardProps) {
   const navigate = useNavigate();
+  const [multiRepoOpen, setMultiRepoOpen] = useState(false);
+  const repoButtonsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        repoButtonsRef.current &&
+        !repoButtonsRef.current.contains(event.target as Node)
+      ) {
+        setMultiRepoOpen(false);
+      }
+    };
+
+    if (multiRepoOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [multiRepoOpen]);
 
   const renderProjectIcon = () => {
     const hasIcons = project.iconLight || project.iconDark;
@@ -119,36 +141,73 @@ export function ProjectCard({ project, onDelete }: ProjectCardProps) {
       </CardContent>
 
       <CardFooter className="flex gap-2 pt-3 border-t">
+        {
+          // todo: add motion to the button movement
+        }
         {project.githubRepos && project.githubRepos.length > 0 && (
-          <Tooltip>
-            <TooltipTrigger>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 relative"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (project.githubRepos && project.githubRepos.length > 0) {
-                    window.open(project.githubRepos[0], "_blank");
-                  }
-                }}
-              >
-                <Github className="h-4 w-4" />
-                {project.githubRepos.length > 1 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
-                    {project.githubRepos.length}
-                  </span>
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="text-xs">
-                {project.githubRepos.length > 1
-                  ? `View ${project.githubRepos.length} GitHub repositories`
-                  : "View on GitHub"}
-              </p>
-            </TooltipContent>
-          </Tooltip>
+          <div ref={repoButtonsRef} className="flex gap-2">
+            {!multiRepoOpen ? (
+              <Tooltip>
+                <TooltipTrigger>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8 relative"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (project.githubRepos?.length === 1) {
+                        window.open(project.githubRepos[0], "_blank");
+                      } else {
+                        setMultiRepoOpen(true);
+                      }
+                    }}
+                  >
+                    <Github className="h-4 w-4" />
+                    {(project.githubRepos?.length ?? 0) > 1 && (
+                      <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-medium text-primary-foreground flex items-center justify-center">
+                        {project.githubRepos?.length}
+                      </span>
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-xs">
+                    {project.githubRepos?.length === 1
+                      ? project.githubRepos[0].replace(
+                          "https://github.com/",
+                          "",
+                        )
+                      : `${project.githubRepos.length} GitHub repos`}
+                  </p>
+                </TooltipContent>
+              </Tooltip>
+            ) : (
+              <>
+                {project.githubRepos.map((repo, index) => (
+                  <Tooltip key={index}>
+                    <TooltipTrigger>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(repo, "_blank");
+                        }}
+                      >
+                        <Github className="h-4 w-4" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="text-xs">
+                        {repo.replace("https://github.com/", "")}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                ))}
+              </>
+            )}
+          </div>
         )}
         {project.projectLink && (
           <Tooltip>
