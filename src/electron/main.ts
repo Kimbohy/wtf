@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from "electron";
+import { app, BrowserWindow, Menu } from "electron";
 import path from "path";
 import { fileURLToPath } from "url";
 import { readFileSync, existsSync } from "fs";
@@ -83,6 +83,7 @@ app.whenReady().then(async () => {
   loadEnvFile();
   await startBackend();
   await createWindow();
+  Menu.setApplicationMenu(null); // Supprime le menu complètement
 });
 
 app.on("window-all-closed", () => {
